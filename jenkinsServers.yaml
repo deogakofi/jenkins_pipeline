@@ -14,15 +14,25 @@ Resources:
               - IpProtocol: tcp
                 FromPort: 22
                 ToPort: 22
-                CidrIp: 86.146.22.146/32
+                CidrIp: 881.156.228.212/32
               - IpProtocol: tcp
                 FromPort: 8080
                 ToPort: 8080
-                CidrIp: 86.146.22.146/32
+                CidrIp: 81.156.228.212/32
               - IpProtocol: tcp
                 FromPort: 80
                 ToPort: 80
-                CidrIp: 86.146.22.146/32
+                CidrIp: 81.156.228.212/32
+            SecurityGroupEgress:
+              - IpProtocol: tcp
+                FromPort: 8080
+                ToPort: 8080
+                CidrIp: 0.0.0.0/0
+              - IpProtocol: tcp
+                FromPort: 80
+                ToPort: 80
+                CidrIp: 0.0.0.0/0
+
             Tags:
               - Key: Name
                 Value: !Sub ${EnvironmentName} JenkinsSecurityGroup
@@ -42,6 +52,7 @@ Resources:
                 #!/bin/bash
                 apt-get update -y
                 apt-get install openjdk-8-jdk -y
+                apt-get install tidy -y
                 wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
                 sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
                 apt-get update
@@ -52,6 +63,8 @@ Resources:
                 systemctl restart jenkins
                 apt install -y ansible
                 apt install -y python-pip
+                apt-get install apache2 -y
+                systemctl start apache2.service
                 mkdir -p nginx_ansible/roles/nginx/tasks
 
 
