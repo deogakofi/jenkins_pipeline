@@ -1,10 +1,17 @@
+# Declare stack description
 Description: >
     Deoga Kofi / Jenkins Servers
+
+# Declare parameters for stack
 Parameters:
   EnvironmentName:
       Description: Single Parameter that we are passing with the env name.
       Type: String
+
+# Declare stack resources
 Resources:
+      # Create security group to allow your ip to access resources from port 8080 and port 80
+      # Security group also allows resources to access the world via port 8080 80 and 443
       JenkinsSecurityGroup:
           Type: AWS::EC2::SecurityGroup
           Properties:
@@ -12,17 +19,13 @@ Resources:
             GroupName: JenkinsSecurityGroup
             SecurityGroupIngress:
               - IpProtocol: tcp
-                FromPort: 22
-                ToPort: 22
-                CidrIp: 881.156.228.212/32
-              - IpProtocol: tcp
                 FromPort: 8080
                 ToPort: 8080
-                CidrIp: 81.156.228.212/32
+                CidrIp: YO.UR.IP.HE/RE
               - IpProtocol: tcp
                 FromPort: 80
                 ToPort: 80
-                CidrIp: 81.156.228.212/32
+                CidrIp: YO.UR.IP.HE/RE
             SecurityGroupEgress:
               - IpProtocol: tcp
                 FromPort: 8080
@@ -32,12 +35,17 @@ Resources:
                 FromPort: 80
                 ToPort: 80
                 CidrIp: 0.0.0.0/0
+              - IpProtocol: tcp
+                FromPort: 443
+                ToPort: 443
+                CidrIp: 0.0.0.0/0
 
             Tags:
               - Key: Name
                 Value: !Sub ${EnvironmentName} JenkinsSecurityGroup
             VpcId: vpc-c64106be
 
+      # Create s3 bucket to host static website
       jenkinspipelinectb:
           Type: AWS::S3::Bucket
           Properties:
@@ -48,7 +56,7 @@ Resources:
               ErrorDocument: index.html # just send to app, let React handle errors and routing
 
       # Add a Bucket Policy that lets public visitors access the web app
-      JenkinsBucketPolicy:
+      MyBucketPolicy:
         Type: AWS::S3::BucketPolicy
         Properties:
           Bucket: !Ref jenkinspipelinectb # attach to bucket being created
@@ -62,13 +70,13 @@ Resources:
                 Action: 's3:GetObject'
                 Resource: !Join ['', ['arn:aws:s3:::', !Ref jenkinspipelinectb, /*]]
 
+      # Create instance using base64 script to prepare jenkins environment
       JenkinsEc2Instance:
           DependsOn: JenkinsSecurityGroup
           Type: AWS::EC2::Instance
           Properties:
             ImageId: ami-0d1cd67c26f5fca19
             InstanceType: t2.micro
-            KeyName: s2app
             SecurityGroupIds:
               - !Ref JenkinsSecurityGroup
             SubnetId: subnet-0db61550
@@ -79,7 +87,7 @@ Resources:
                 apt-get install openjdk-8-jdk -y
                 apt-get install tidy -y
                 wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
-                sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+                sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
                 apt-get update
                 apt-get install -y jenkins
                 systemctl start jenkins
@@ -97,7 +105,10 @@ Resources:
               - Key: Name
                 Value: !Sub ${EnvironmentName} JenkinsEc2Instance
 
+# Create outputs for stack
 Outputs:
+
+  # Create url output for s3 static site
   JenkinsInstance:
       Description: Reference to the jenkins instance
       Value: !Ref JenkinsEc2Instance
