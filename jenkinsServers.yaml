@@ -14,7 +14,7 @@ Resources:
               - IpProtocol: tcp
                 FromPort: 22
                 ToPort: 22
-                CidrIp: 881.156.228.212/32
+                CidrIp: 81.156.228.212/32
               - IpProtocol: tcp
                 FromPort: 8080
                 ToPort: 8080
