@@ -1,10 +1,16 @@
+# Describe stack
 Description: >
     Deoga Kofi / Jenkins Environment
+
+# Declare parameters
 Parameters:
   EnvironmentName:
       Description: Single Parameter that we are passing with the env name.
       Type: String
+
+# Declare Resources
 Resources:
+    # Declare IAM policy for users
     MinimumSecurityModel:
         DependsOn: DevUser
         Type: 'AWS::IAM::Policy'
@@ -77,6 +83,8 @@ Resources:
                 Resource: "*"
           Groups:
             - !Ref DevGroup
+
+    # Declare the IAM role for users
     developerrole:
         DependsOn: MinimumSecurityModel
         Type: AWS::IAM::Role
@@ -99,16 +107,21 @@ Resources:
           Tags:
             - Key: Name
               Value: !Sub ${EnvironmentName} developerrole
+
+    # Declare a group for dev users
     DevGroup:
         Type: AWS::IAM::Group
         Properties:
           GroupName: DevGroup
 
+    # Create access key for dev user
     DevAccessKey:
       DependsOn: DevUser
       Type: AWS::IAM::AccessKey
       Properties:
         UserName: !Ref DevUser
+
+    # Create dev user
     DevUser:
         DependsOn: DevGroup
         Type: AWS::IAM::User
@@ -119,27 +132,18 @@ Resources:
           LoginProfile:
             Password: Password
             PasswordResetRequired: true
-    DNS:
-      Type: "AWS::Route53::HostedZone"
-      Properties:
-        HostedZoneConfig:
-          Comment: 'My hosted zone for JenkinsServers'
-        Name: 'jenkinsservers.com'
-        VPCs:
-          -
-            VPCId: 'vpc-c64106be'
-            VPCRegion: 'us-west-2'
-        HostedZoneTags:
-          -
-            Key: 'Name'
-            Value: 'JenkinsHostedZone'
 
+# Create outputs for stack
 Outputs:
+
+  # Declare dev user id as an output
   DevUser:
       Description: Reference to the dev user
       Value: !Ref DevUser
       Export:
         Name: !Sub ${EnvironmentName}-DEV-USER-ID
+
+  # Extract devuser secret key from outputs of stack
   DevUserAccessKeys:
       Description: AccessKeys for Dev User
       Value: !GetAtt DevAccessKey.SecretAccessKey
