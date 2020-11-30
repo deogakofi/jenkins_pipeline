@@ -32,6 +32,10 @@ Resources:
                 FromPort: 80
                 ToPort: 80
                 CidrIp: 0.0.0.0/0
+              - IpProtocol: tcp
+                FromPort: 443
+                ToPort: 443
+                CidrIp: 0.0.0.0/0
 
             Tags:
               - Key: Name
@@ -79,7 +83,7 @@ Resources:
                 apt-get install openjdk-8-jdk -y
                 apt-get install tidy -y
                 wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
-                sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+                sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
                 apt-get update
                 apt-get install -y jenkins
                 systemctl start jenkins
