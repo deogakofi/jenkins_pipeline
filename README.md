@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Infrastructure as a Code using AWS Cloudformation
 The purpose of this project is to launch a static website from a S3 bucket using cloudformation.
 
@@ -86,3 +87,7 @@ Contains a zipped website code
 Loadbalancer output should look like this
 -----------------------------------------------
 ![image](img/website_screenshot.png)
+=======
+# jenkins_pipeline
+Jenkins Pipleline with blue green deployment for dev and main branch. The pipeline deploys a static website in AWS S3
+>>>>>>> d42191ba51b227705bcc44c97372c907d1507ac1
