@@ -38,10 +38,10 @@ Resources:
                 Value: !Sub ${EnvironmentName} JenkinsSecurityGroup
             VpcId: vpc-c64106be
 
-      jenkins_pipeline:
+      jenkinspipeline:
           Type: AWS::S3::Bucket
           Properties:
-            BucketName: jenkins_pipeline
+            BucketName: jenkinspipeline
             AccessControl: PublicRead # visitors need to be able to access the sie
             WebsiteConfiguration: # this makes the S3 Bucket a static website/app
               IndexDocument: index.html # default object served when visiting S3 domain
@@ -51,7 +51,7 @@ Resources:
       MyBucketPolicy:
         Type: AWS::S3::BucketPolicy
         Properties:
-          Bucket: !Ref jenkins_pipeline # attach to bucket being created
+          Bucket: !Ref jenkinspipeline # attach to bucket being created
           PolicyDocument:
             Id: MyPolicy
             Version: 2012-10-17
@@ -60,7 +60,7 @@ Resources:
                 Effect: Allow
                 Principal: '*' # wildcard, allow all requests
                 Action: 's3:GetObject'
-                Resource: !Join ['', ['arn:aws:s3:::', !Ref jenkins_pipeline, /*]]
+                Resource: !Join ['', ['arn:aws:s3:::', !Ref jenkinspipeline, /*]]
 
       JenkinsEc2Instance:
           DependsOn: JenkinsSecurityGroup
@@ -104,5 +104,5 @@ Outputs:
       Export:
         Name: !Sub ${EnvironmentName}-JenkinsEc2Instance
   WebsiteURL:
-      Value: !GetAtt jenkins_pipeline.WebsiteURL
+      Value: !GetAtt jenkinspipeline.WebsiteURL
       Description: URL for website hosted on S3
